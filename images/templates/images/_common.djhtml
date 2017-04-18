@@ -1,0 +1,5 @@
+<script>
+ $(function() {
+     $("li#nav-images").addClass("active");
+ });
+</script>

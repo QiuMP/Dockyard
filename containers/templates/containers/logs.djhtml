@@ -1,0 +1,77 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3 style="margin-top:0">
+            {% if heart == 'running' %}
+              <span class="green" data-toggle="tooltip" title="Running" data-placement="top" data-container="body">●</span>
+            {% elif heart == 'restarting' %}
+              <span class="green" data-toggle="tooltip" title="Restarting" data-placement="top" data-container="body">●</span>
+            {% elif heart == 'paused' %}
+              <span class="yellow" data-toggle="tooltip" title="Paused" data-placement="top" data-container="body">●</span>
+            {% elif heart == 'exited' %}
+              <span class="red" data-toggle="tooltip" title="Exited" data-placement="top" data-container="body">●</span>
+            {% elif heart == 'created' %}
+              <span class="red" data-toggle="tooltip" title="Created" data-placement="top" data-container="body">●</span>
+            {% else %}
+              <td>?</td>
+            {% endif %}
+
+            {{ name }}
+            <small>{{ image }}</small>
+          </h3>
+        </div>
+        <div class="col-sm-6 hidden-xs">
+          <p class="text-right" style="font-size:1.3em;margin-bottom:2px">
+              {{ created }}
+              <br />
+              {{ status }}
+          </p>
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 15px">
+        <div class="col-sm-12" style="line-height:40px">
+          <a href="../" type="button" class="btn btn-danger">
+            <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            <b>Return</b>
+          </a>
+          <button type="button" class="btn btn-primary" onclick="location.reload()">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+            <b>Refresh</b>
+          </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Logs</h3>
+            </div>
+            <div class="panel-body">
+              <pre id="logs" style="word-wrap: normal">
+                {{ logs }}
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "containers/_common.djhtml" %}
+  <script>
+   $(function () {
+       // 工具说明
+       $("[data-toggle='tooltip']").tooltip();
+
+       $("#logs").text(function(){
+           return $(this).text().replace(/^\s+|\s+$/g,"");
+       });
+   })
+  </script>
+{% endblock %}

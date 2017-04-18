@@ -1,0 +1,45 @@
+{% extends "base.djhtml" %}
+
+{% block base_content %}
+  <div class="container">
+    <div class="row">
+        <h1 class="text-center" style="font-size:72px; color:#ffffff; font-family: 'Poiret One', sans-serif; margin-bottom:50px; margin-top:50px; font-weight:100">Dockyard</h1>
+        <div class="panel panel-default center-block" style="width: 350px; background: rgba(255, 255, 255, 0.5); border-width:0; border-radius: 25px; padding:15px">
+          <div class="panel-body">
+            {% if messages %}
+              {% for message in messages %}
+                {% if message.tags == 'info' %}
+                  <div class="alert alert-info" role="alert" style="margin-bottom: 15px">{{ message }}</div>
+                {% else %}
+                  <div class="alert alert-danger" role="alert" style="margin-bottom: 15px">{{ message }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'accounts:login' %}">
+              {% csrf_token %}
+              <div class="form-group has-feedback">
+                <label class="control-label sr-only" for="username">Input with success</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                <span class="glyphicon glyphicon-user form-control-feedback" aria-hidden="true"></span>
+              </div>
+              <div class="form-group has-feedback">
+                <label class="control-label sr-only" for="password">Input with success</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                <span class="glyphicon glyphicon-lock form-control-feedback" aria-hidden="true"></span>
+              </div>
+              <button type="submit" class="btn btn-primary center-block">Login</button>
+            </form>
+          </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+   $(function(){
+       $('body').css("background", "rgba(0, 68, 91, 1)");
+   })
+  </script>
+{% endblock %}

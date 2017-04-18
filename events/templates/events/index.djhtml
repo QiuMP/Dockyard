@@ -1,0 +1,97 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="row show-grid">
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-primary" onclick="location.reload()">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+        <b>Refresh</b>
+      </button>
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cleanModal">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        <b>Clean Events</b>
+      </button>
+    </div>
+    <div class="clearfix visible-xs-block" style="height:10px"></div>
+    <div class="col-sm-offset-3 col-sm-3">
+      <div class="has-feedback">
+        <input type="text" class="form-control" id="search-events" aria-describedby="clean" placeholder="Search events...">
+        <span class="glyphicon glyphicon-search form-control-feedback" id="search-events-clean" aria-hidden="true"></span>
+        <span id="clean" class="sr-only">search events</span>
+      </div>
+    </div>
+  </div>
+  <!-- 删除弹出框 -->
+  <div class="modal fade" id="cleanModal" tabindex="-1" role="dialog" aria-labelledby="cleanModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="cleanModalLabel">Clean Events</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to clean all events?</p>
+        </div>
+        <div class="modal-footer">
+          <form id="form-clean" method="post" action="{% url 'events:clean' %}">
+            {% csrf_token %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-danger" id="btn-clean">Confirm</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 事件表格 -->
+  <div class="row">
+    <div class="col-sm-12 table-responsive">
+      <table id="events-table" class="table table-bordered table-hover">
+        <thead>
+          <tr class="title">
+            <th>Time</th>
+            <th>User</th>
+            <th>Type</th>
+            <th>Operation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in event_list %}
+            <tr>
+              <td>{{ event.time|date:"Y-m-d H:i:s O" }}</td>
+              <td>{{ event.user }}</td>
+              <td>{{ event.get_type_display }}</td>
+              <td>{{ event.operation }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5"><div class="alert alert-danger" role="alert" style="margin-bottom:0">No Event!</div></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "events/_common.djhtml" %}
+  <script>
+   $.ajaxSetup({
+       data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+   });
+   $(function(){
+       // 实现搜索功能
+       $("#search-events").bind("input propertychange", function(){
+           var searchText = $(this).val().toLowerCase();
+           $("#events-table tbody").find("tr").each(function(){
+               $(this).show();
+               cells = $(this).find("td");
+               if (cells.eq(1).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(2).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1)
+                   $(this).hide();
+           });
+       });
+   })
+  </script>
+{% endblock %}

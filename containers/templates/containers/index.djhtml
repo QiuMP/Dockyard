@@ -1,0 +1,187 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="row show-grid">
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-primary" onclick="location.reload()">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+        <b>Refresh</b>
+      </button>
+      <a href="{% url 'containers:deploy' %}" type="button" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        <b>Deploy Container</b>
+      </a>
+    </div>
+    <div class="clearfix visible-xs-block" style="height:10px"></div>
+    <div class="col-sm-offset-3 col-sm-3">
+      <div class="has-feedback">
+        <input type="text" class="form-control" id="search-containers" aria-describedby="clean" placeholder="Search containers...">
+        <span class="glyphicon glyphicon-search form-control-feedback" id="search-containers-clean" aria-hidden="true"></span>
+        <span id="clean" class="sr-only">search containers</span>
+      </div>
+    </div>
+  </div>
+  <!-- 容器表格 -->
+  <div class="row">
+    <div class="col-sm-12 table-responsive">
+      <table id="containers-table" class="table table-bordered table-hover" style="margin-bottom:300px">
+        <colgroup>
+          <col span="1" style="width:31px" />
+          <col span="5"/>
+          <col style="width:97px"/>
+        </colgroup>
+        <thead>
+          <tr class="title">
+            <th data-toggle="tooltip" title="Status" data-placement="top" data-container="body"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
+            <th>Names</th>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for container in container_list %}
+            <tr>
+              {% if container.heart == 'running' %}
+                <td data-toggle="tooltip" title="Running" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-green">●</span>
+                  <span class="sr-only">running</span>
+                </td>
+              {% elif container.heart == 'restarting' %}
+                <td data-toggle="tooltip" title="Restarting" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-green">●</span>
+                  <span class="sr-only">restarting</span>
+                </td>
+              {% elif container.heart == 'paused' %}
+                <td data-toggle="tooltip" title="Paused" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-yellow">●</span>
+                  <span class="sr-only">paused</span>
+                </td>
+              {% elif container.heart == 'exited' %}
+                <td data-toggle="tooltip" title="Exited" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-red">●</span>
+                  <span class="sr-only">exited</span>
+                </td>
+              {% elif container.heart == 'created' %}
+                <td data-toggle="tooltip" title="Created" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-red">●</span>
+                  <span class="sr-only">created</span>
+                </td>
+              {% else %}
+                <td>?</td>
+              {% endif %}
+
+              <td>{{ container.name }}</td>
+              <td>{{ container.short_id }}</td>
+              <td>
+                <span class="label label-default" style="font-size:0.9em">{{ container.image }}</span>
+              </td>
+              <td>{{ container.status }}</td>
+              <td>{{ container.created }}</td>
+              <td>
+                <a href="{{ container.id }}" style="margin-right:0.3em" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-container="body">
+                    <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                  </button>
+                  <ul id="container-menu" class="dropdown-menu dropdown-menu-right">
+                    {% if container.heart == 'running' or container.heart == 'restarting' %}
+                      <li><a href="#" data-toggle="modal" data-target="#pauseModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-pause" aria-hidden="true"></span>
+                        Pause
+                      </a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#restartModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                        Restart
+                      </a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#stopModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+                        Stop
+                      </a></li>
+                      <li><a href="#">
+                        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                        Stats
+                      </a></li>
+                      <li><a href="#">
+                        <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
+                        Console
+                      </a></li>
+                    {% elif container.heart == 'exited' or container.heart == 'created' %}
+                      <li><a href="#" data-toggle="modal" data-target="#startModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                        Start
+                      </a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#destroyModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        Destroy
+                      </a></li>
+                    {% elif container.heart == 'paused' %}
+                      <li><a href="#" data-toggle="modal" data-target="#unpauseModal" data-whatever="{{ container.name }}">
+                        <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                        Unpause
+                      </a></li>
+                    {% endif %}
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" data-toggle="modal" data-target="#renameModal" data-whatever="{{ container.name }}">
+                      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                      Rename
+                    </a></li>
+
+                    <li><a href="#" data-toggle="modal" data-target="#commitModal" data-whatever="{{ container.name }}">
+                      <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                      Commit
+                    </a></li>
+                    <li><a href="{{ container.id }}/logs">
+                      <span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+                      <b>Logs</b>
+                    </a></li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7"><div class="alert alert-danger" role="alert" style="margin-bottom:0">Connection failed!</div></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% include "containers/_model_html.djhtml" %}
+{% endblock %}
+
+{% block extra_js %}
+  {% include "containers/_common.djhtml" %}
+  {% include "containers/_model_js.djhtml" %}
+  <script>
+   $(function () {
+       // 工具说明
+       $("[data-toggle='tooltip']").tooltip();
+
+       // 实现搜索功能
+       $("#search-containers").bind("input propertychange", function(){
+           var searchText = $(this).val().toLowerCase();
+           $("#containers-table tbody").find("tr").each(function(){
+               $(this).show();
+               cells = $(this).find("td");
+               if (cells.eq(0).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(1).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(2).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1
+               )
+                   $(this).hide();
+           });
+       });
+
+       // 删除镜像
+       /* $("#removeModal").on("show.bs.modal", function(event){
+        *     var button = $(event.relatedTarget);
+        *     var hostname = button.data('whatever');
+        *     $(this).find('.modal-title').html('Remove Node: <i>' + hostname + '</i>');
+        * });*/
+   })
+  </script>
+{% endblock %}

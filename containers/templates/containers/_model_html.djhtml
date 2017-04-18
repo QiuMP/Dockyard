@@ -1,0 +1,177 @@
+<!-- 容器操作确认框 -->
+<div class="modal fade" id="startModal" tabindex="-1" role="dialog" aria-labelledby="startModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="startModalLabel">Start Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to start this container?</p>
+        <form id="form-start" method="post" action="{% url 'containers:start' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-start" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="restartModal" tabindex="-1" role="dialog" aria-labelledby="restartModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="restartModalLabel">Restart Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to restart this container?</p>
+        <form id="form-restart" method="post" action="{% url 'containers:restart' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-restart" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="destroyModal" tabindex="-1" role="dialog" aria-labelledby="destroyModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="destroyModalLabel">Destroy Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to destroy this container?</p>
+        <form id="form-destroy" method="post" action="{% url 'containers:destroy' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-destroy" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="stopModal" tabindex="-1" role="dialog" aria-labelledby="stopModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="stopModalLabel">Stop Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to stop this container?</p>
+        <form id="form-stop" method="post" action="{% url 'containers:stop' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-stop" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="pauseModal" tabindex="-1" role="dialog" aria-labelledby="pauseModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="pauseModalLabel">Pause Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to pause this container?</p>
+        <form id="form-pause" method="post" action="{% url 'containers:pause' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-pause" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="unpauseModal" tabindex="-1" role="dialog" aria-labelledby="unpauseModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="unpauseModalLabel">Unpause Container</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to unpause this container?</p>
+        <form id="form-unpause" method="post" action="{% url 'containers:unpause' %}">
+          {% csrf_token %}
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-unpause" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 改名与提交提示框 -->
+<div class="modal fade" id="renameModal" tabindex="-1" role="dialog" aria-labelledby="renameModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="renameModalLabel">Rename Container</h4>
+      </div>
+      <div class="modal-body">
+        <form id="form-rename" method="post" action="{% url 'containers:rename' %}">
+          {% csrf_token %}
+          <div id="form-group-rename" class="form-group">
+            <label for="rename-name" class="control-label">Name</label>
+            <input type="text" class="form-control" id="rename-name" name="container_rename">
+          </div>
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-rename" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="commitModal" tabindex="-1" role="dialog" aria-labelledby="commitModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="commitModalLabel">Commit Container</h4>
+      </div>
+      <div class="modal-body">
+        <form id="form-commit" method="post" action="{% url 'containers:commit' %}">
+          {% csrf_token %}
+          <div id="form-group-commit" class="form-group">
+            <label for="commit-name" class="control-label">Image's Name</label>
+            <input type="text" class="form-control" id="commit-name" placeholder="Repository:Image" name="commit_name">
+          </div>
+          <input type="text" class="sr-only container-name" name="container_name">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-commit" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,375 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Container Deployment</h3>
+    </div>
+    <div class="panel-body">
+      <form action="{% url 'containers:deploy' %}" method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Basic Configuration</h3>
+              </div>
+              <div class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label for="container-name">Container Name</label>
+                      <input type="text" class="form-control" id="container-name" name="container_name" placeholder="Container Name">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="image-name">Image Name</label>
+                      <select class="form-control" id="image-name" name="image_name">
+                        {% for image in image_list %}
+                          <option>{{ image }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label for="hostname">Hostname</label>
+                      <input type="text" class="form-control" id="hostname" name="hostname" placeholder="Hostname">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="domain">Domain</label>
+                      <input type="text" class="form-control" id="domain" name="domain" placeholder="Domain">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="command">Command</label>
+                  <input type="text" class="form-control" id="command" name="command" placeholder="Command">
+                </div>
+                <div class="form-group">
+                  <label for="restart">Restart Policy</label>
+                  <select class="form-control" id="restart" name="restart">
+                    <option>Do not automatically restart</option>
+                    <option>Restart only on failure</option>
+                    <option>Always restart</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Environment Variables</h3>
+              </div>
+              <div id="variable-body" class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <label for="variable-name">Name</label>
+                      <input type="text" class="form-control" id="variable-name" name="variable_name" placeholder="Variable Name">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="variable-value">Value</label>
+                      <input type="text" class="form-control" id="variable-value" name="variable_value" placeholder="Variable Value">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" id="variable-plus" class="btn btn-success" style="margin-top:25px">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="variable-div" class="row sr-only">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="variable_name" placeholder="Variable Name">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="variable_value" placeholder="Variable Value">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" class="btn btn-danger" onclick="$(this).parents('#variable-div').remove()">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Volumes</h3>
+              </div>
+              <div id="volume-body" class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <label for="host-path">Host Path</label>
+                      <input type="text" class="form-control" id="host-path" name="host_path" placeholder="Host Path">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="container-path">Container Path</label>
+                      <input type="text" class="form-control" id="container-path" name="container_path" placeholder="Container Path">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" id="volume-plus" class="btn btn-success" style="margin-top:25px">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="volume-div" class="row sr-only">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="host_path" placeholder="Host Path">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="container_path" placeholder="Container Path">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" class="btn btn-danger" onclick="$(this).parents('#volume-div').remove()">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Resource Limits</h3>
+              </div>
+              <div class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label for="cpus">CPUs</label>
+                      <input type="text" class="form-control" id="cpus" name="cpus" placeholder="1024">
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="memory">Memory (MB)</label>
+                      <input type="text" class="form-control" id="memory" name="memory" placeholder="∞">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Container Links</h3>
+              </div>
+              <div id="link-body" class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <label for="link.container">Container</label>
+                      <select class="form-control" id="link.container" name="link_container">
+                        {% for container in container_list %}
+                          <option>{{ container }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="link-alias">Alias</label>
+                      <input type="text" class="form-control" id="link-alias" name="link_alias" placeholder="Link Alias">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" id="link-plus" class="btn btn-success" style="margin-top:25px">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="link-div" class="row sr-only">
+                  <div class="col-xs-5">
+                    <div class="form-group">
+                      <select class="form-control" name="link_container">
+                        {% for container in container_list %}
+                          <option>{{ container }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-xs-6" style="padding-left:0">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="link_alias" placeholder="Link Alias">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" class="btn btn-danger" onclick="$(this).parents('#link-div').remove()">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Network Configuration</h3>
+              </div>
+              <div id="network-body" class="panel-body" style="padding-bottom:5px">
+                <div class="form-group">
+                  <label for="network-mode">Network Mode</label>
+                  <select class="form-control" id="network-mode" name="network_mode">
+                    <option>Bridge</option>
+                    <option>Host</option>
+                    <option>None</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <div class="col-xs-11">
+                    <div class="form-group">
+                      <label for="container-dns">Container DNS</label>
+                      <input type="text" class="form-control" id="container-dns" name="container_dns" placeholder="Container DNS">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" id="dns-plus" class="btn btn-success" style="margin-top:25px">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="dns-div" class="row sr-only">
+                  <div class="col-xs-11">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="container_dns" placeholder="Container DNS">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" class="btn btn-danger" onclick="$(this).parents('#dns-div').remove()">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Port Configuration</h3>
+              </div>
+              <div class="panel-body" style="padding-bottom:5px">
+                <div class="row">
+                  <div class="col-xs-3">
+                    <div class="form-group">
+                      <label for="port.container">Container Port</label>
+                      <input type="text" class="form-control" id="port.container" name="port_container" placeholder="Container Port">
+                    </div>
+                  </div>
+                  <div class="col-xs-2" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="port.protocol">Protocol</label>
+                      <select class="form-control" id="port.protocol" name="port_protocol">
+                        <option>TCP</option>
+                        <option>UDP</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-xs-4" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="port.address">Host Listen Address</label>
+                      <input type="text" class="form-control" id="port.address" name="port_address" placeholder="0.0.0.0">
+                    </div>
+                  </div>
+                  <div class="col-xs-2" style="padding-left:0">
+                    <div class="form-group">
+                      <label for="port.host">Host Port</label>
+                      <input type="text" class="form-control" id="port.host" name="port_host" placeholder="Host Port">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" id="port-plus" class="btn btn-success" style="margin-top:25px">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="port-div" class="row sr-only">
+                  <div class="col-xs-3">
+                    <div class="form-group">
+                      <input type="text" class="form-control" id="port.container" name="port_container" placeholder="Container Port">
+                    </div>
+                  </div>
+                  <div class="col-xs-2" style="padding-left:0">
+                    <div class="form-group">
+                      <select class="form-control" name="port_protocol">
+                        <option>TCP</option>
+                        <option>UDP</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-xs-4" style="padding-left:0">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="port_address" placeholder="0.0.0.0">
+                    </div>
+                  </div>
+                  <div class="col-xs-2" style="padding-left:0">
+                    <div class="form-group">
+                      <input type="text" class="form-control" name="port_host" placeholder="Host Port">
+                    </div>
+                  </div>
+                  <div class="col-xs-1" style="padding-left:0;">
+                    <button type="button" class="btn btn-danger" onclick="$(this).parents('#port-div').remove()">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                </div>
+                <div id="port-after" class="checkbox" style="margin-top:0">
+                  <label>
+                    <input type="checkbox" name="expose_all"> Automatically expose all ports
+                  </label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Deploy</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "containers/_common.djhtml" %}
+  {% include "containers/_model_html.djhtml" %}
+  <script>
+   $(function () {
+       $("#variable-plus").click(function(){
+           $("#variable-body").append($("#variable-div").clone().removeClass("sr-only"));
+       })
+
+       $("#volume-plus").click(function(){
+           $("#volume-body").append($("#volume-div").clone().removeClass("sr-only"));
+       })
+
+       $("#dns-plus").click(function(){
+           $("#network-body").append($("#dns-div").clone().removeClass("sr-only"));
+       })
+
+       $("#link-plus").click(function(){
+           $("#link-body").append($("#link-div").clone().removeClass("sr-only"));
+       })
+
+       $("#port-plus").click(function(){
+           $("#port-after").before($("#port-div").clone().removeClass("sr-only"));
+       })
+   })
+  </script>
+{% endblock %}

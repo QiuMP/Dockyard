@@ -1,0 +1,5 @@
+<script>
+ $(function() {
+     $("li#nav-nodes").addClass("active");
+ });
+</script>

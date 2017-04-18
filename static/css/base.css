@@ -1,0 +1,93 @@
+/* 调整间距 */
+body {
+    padding-top: 65px;
+}
+
+.show-grid {
+    margin-bottom: 15px;
+}
+
+.alert {
+    margin-bottom: 10px;
+}
+
+button {
+    margin-right: 0.3em;
+}
+
+/* 状态圆点 */
+span.round-text {
+    display: inline-block;
+    margin-bottom: 4px;
+    vertical-align: bottom;
+}
+
+span.round-green {
+    font-size: 1.5em;
+    color: #5bbd72;
+    cursor: default;
+}
+
+span.round-yellow {
+    font-size: 1.5em;
+    color: #f2c61f;
+    cursor: default;
+}
+
+span.round-red {
+    font-size: 1.5em;
+    color: #d95c5c;
+    cursor: default;
+}
+
+span.green {
+    color: #5bbd72;
+}
+
+span.yellow {
+    color: #f2c61f;
+}
+
+span.red {
+    color: #d95c5c;
+}
+
+/* 表格 */
+th,
+td {
+    vertical-align: middle !important;
+}
+
+tr.title {
+    background-color: #eeeeee;
+}
+
+/* 按钮图标间距调整 */
+button span.glyphicon {
+    margin-right: 0.3em;
+}
+
+a span.glyphicon {
+    margin-right: 0.3em;
+}
+
+span.glyphicon:only-child {
+    margin-right: 0;
+}
+
+.nav span.glyphicon {
+    margin-right: 0.5em;
+}
+
+/* 容器菜单 */
+#container-menu {
+    min-width: auto;
+}
+
+#container-menu span.glyphicon {
+    margin-right: 0.3em;
+}
+
+#container-menu a {
+    line-height: 2em;
+}

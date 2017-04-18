@@ -1,0 +1,106 @@
+<script>
+ // 启动
+ $("#startModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.modal-title').html('Start Container: <i>' + id + '</i>');
+     $(this).find('.container-name').val(id);
+ });
+
+ $("#btn-start").click(function(){
+     $("#form-start").submit();
+ });
+
+ // 重启
+ $("#restartModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.container-name').val(id);
+     $(this).find('.modal-title').html('Restart Container: <i>' + id + '</i>');
+ });
+
+ $("#btn-restart").click(function(){
+     $("#form-restart").submit();
+ });
+
+ // 停止
+ $("#stopModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.container-name').val(id);
+     $(this).find('.modal-title').html('Stop Container: <i>' + id + '</i>');
+ });
+
+ $("#btn-stop").click(function(){
+     $("#form-stop").submit();
+ });
+
+ // 暂停
+ $("#pauseModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.container-name').val(id);
+     $(this).find('.modal-title').html('Pause Container: <i>' + id + '</i>');
+ });
+
+ $("#btn-pause").click(function(){
+     $("#form-pause").submit();
+ });
+
+ // 取消暂停
+ $("#unpauseModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.container-name').val(id);
+     $(this).find('.modal-title').html('Unpause Container: <i>' + id + '</i>');
+ });
+
+ $("#btn-unpause").click(function(){
+     $("#form-unpause").submit();
+ });
+
+ // 删除
+ $("#destroyModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.container-name').val(id);
+     $(this).find('.modal-title').html('Destroy Container: <i>' + id + '</i>');
+ });
+
+ $("#btn-destroy").click(function(){
+     $("#form-destroy").submit();
+ });
+
+ // 改名
+ $("#renameModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.modal-title').html('Rename Container: <i>' + id + '</i>');
+     $(this).find('#rename-name').val(id);
+     $(this).find('.container-name').val(id);
+ });
+
+ $("#btn-rename").click(function(){
+     if ($("#rename-name").val()) {
+         $("#form-rename").submit();
+     } else {
+         $("#form-group-rename").addClass("has-error");
+     }
+ });
+
+ // 提交
+ $("#commitModal").on("show.bs.modal", function(event){
+     var button = $(event.relatedTarget);
+     var id = button.data('whatever');
+     $(this).find('.modal-title').html('Commit Container: <i>' + id + '</i>');
+     $(this).find('.container-name').val(id);
+ });
+
+ $("#btn-commit").click(function(){
+     if ($("#commit-name").val()) {
+         $("#form-commit").submit();
+     } else {
+         $("#form-group-commit").addClass("has-error");
+     }
+ });
+</script>
