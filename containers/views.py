@@ -19,7 +19,7 @@ def _create_event(user, node, operation):
 
 
 def _get_client(url="tcp://192.168.248.101:5000"):
-    return docker.from_env(version='auto', environment={"DOCKER_HOST": url})
+    return docker.from_env(timeout=1, version='auto', environment={"DOCKER_HOST": url})
 
 
 @login_required
