@@ -27,18 +27,19 @@
       <table id="containers-table" class="table table-bordered table-hover" style="margin-bottom:300px">
         <colgroup>
           <col span="1" style="width:31px" />
-          <col span="5"/>
+          <col span="6"/>
           <col style="width:97px"/>
         </colgroup>
         <thead>
           <tr class="title">
             <th data-toggle="tooltip" title="Status" data-placement="top" data-container="body"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
-            <th>Names</th>
+            <th>Node</th>
+            <th>Name</th>
             <th>ID</th>
             <th>Image</th>
             <th>Status</th>
             <th>Created</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -73,6 +74,7 @@
                 <td>?</td>
               {% endif %}
 
+              <td>{{ container.node }}</td>
               <td>{{ container.name }}</td>
               <td>{{ container.short_id }}</td>
               <td>
@@ -100,14 +102,14 @@
                         <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
                         Stop
                       </a></li>
-                      <li><a href="#">
-                        <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
-                        Stats
-                      </a></li>
-                      <li><a href="#">
-                        <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
-                        Console
-                      </a></li>
+                      <!-- <li><a href="#">
+                           <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                           Stats
+                           </a></li> -->
+                      <!-- <li><a href="{{ container.id }}/console">
+                           <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
+                           Console
+                           </a></li> -->
                     {% elif container.heart == 'exited' or container.heart == 'created' %}
                       <li><a href="#" data-toggle="modal" data-target="#startModal" data-whatever="{{ container.name }}">
                         <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
@@ -171,6 +173,7 @@
                    && cells.eq(1).text().toLowerCase().indexOf(searchText) == -1
                    && cells.eq(2).text().toLowerCase().indexOf(searchText) == -1
                    && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(4).text().toLowerCase().indexOf(searchText) == -1
                )
                    $(this).hide();
            });

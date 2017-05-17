@@ -16,16 +16,28 @@
               </div>
               <div class="panel-body" style="padding-bottom:5px">
                 <div class="row">
-                  <div class="col-xs-6">
+                  <div class="col-xs-12">
                     <div class="form-group">
                       <label for="container-name">Container Name</label>
-                      <input type="text" class="form-control" id="container-name" name="container_name" placeholder="Container Name">
+                      <input type="text" class="form-control" id="container-name" name="name" placeholder="Container Name">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-6">
+                    <div class="form-group">
+                      <label for="node-name">Node Name</label>
+                      <select class="form-control" id="node-name" name="node">
+                        {% for node in node_list %}
+                          <option>{{ node.name }}</option>
+                        {% endfor %}
+                      </select>
                     </div>
                   </div>
                   <div class="col-xs-6" style="padding-left:0">
                     <div class="form-group">
                       <label for="image-name">Image Name</label>
-                      <select class="form-control" id="image-name" name="image_name">
+                      <select class="form-control" id="image-name" name="image">
                         {% for image in image_list %}
                           <option>{{ image }}</option>
                         {% endfor %}
@@ -43,7 +55,7 @@
                   <div class="col-xs-6" style="padding-left:0">
                     <div class="form-group">
                       <label for="domain">Domain</label>
-                      <input type="text" class="form-control" id="domain" name="domain" placeholder="Domain">
+                      <input type="text" class="form-control" id="domain" name="domainname" placeholder="Domain">
                     </div>
                   </div>
                 </div>
@@ -53,10 +65,10 @@
                 </div>
                 <div class="form-group">
                   <label for="restart">Restart Policy</label>
-                  <select class="form-control" id="restart" name="restart">
-                    <option>Do not automatically restart</option>
-                    <option>Restart only on failure</option>
-                    <option>Always restart</option>
+                  <select class="form-control" id="restart" name="restart_policy">
+                    <option value="no">Do not automatically restart</option>
+                    <option value="on-failure">Restart only on failure</option>
+                    <option value="always">Always restart</option>
                   </select>
                 </div>
               </div>
@@ -163,7 +175,7 @@
                   </div>
                   <div class="col-xs-6" style="padding-left:0">
                     <div class="form-group">
-                      <label for="memory">Memory (MB)</label>
+                      <label for="memory">Memory</label>
                       <input type="text" class="form-control" id="memory" name="memory" placeholder="∞">
                     </div>
                   </div>
@@ -178,8 +190,8 @@
                 <div class="row">
                   <div class="col-xs-5">
                     <div class="form-group">
-                      <label for="link.container">Container</label>
-                      <select class="form-control" id="link.container" name="link_container">
+                      <label for="link-container">Container</label>
+                      <select class="form-control link-container" id="link-container" name="link_container">
                         {% for container in container_list %}
                           <option>{{ container }}</option>
                         {% endfor %}
@@ -201,7 +213,7 @@
                 <div id="link-div" class="row sr-only">
                   <div class="col-xs-5">
                     <div class="form-group">
-                      <select class="form-control" name="link_container">
+                      <select class="form-control link-container" name="link_container">
                         {% for container in container_list %}
                           <option>{{ container }}</option>
                         {% endfor %}
@@ -229,9 +241,9 @@
                 <div class="form-group">
                   <label for="network-mode">Network Mode</label>
                   <select class="form-control" id="network-mode" name="network_mode">
-                    <option>Bridge</option>
-                    <option>Host</option>
-                    <option>None</option>
+                    <option value="bridge">Bridge</option>
+                    <option value="host">Host</option>
+                    <option value="none">None</option>
                   </select>
                 </div>
                 <div class="row">
@@ -277,8 +289,8 @@
                     <div class="form-group">
                       <label for="port.protocol">Protocol</label>
                       <select class="form-control" id="port.protocol" name="port_protocol">
-                        <option>TCP</option>
-                        <option>UDP</option>
+                        <option value="tcp">TCP</option>
+                        <option value="udp">UDP</option>
                       </select>
                     </div>
                   </div>
@@ -369,6 +381,23 @@
 
        $("#port-plus").click(function(){
            $("#port-after").before($("#port-div").clone().removeClass("sr-only"));
+       })
+
+       $("#node-name").change(function(){
+           $("#image-name").empty();
+           $(".link-container").empty();
+           data = {"node_name": $(this).val()};
+           $.post("{% url 'containers:deploy_get' %}", data, function(response, status){
+               if (status == "success") {
+                   for(n in response.image_list) {
+                       $("#image-name").append("<option>" + response.image_list[n] + "</option>");
+                   }
+
+                   for(n in response.container_list) {
+                       $(".link-container").append("<option>" + response.container_list[n] + "</option>");
+                   }
+               }
+           })
        })
    })
   </script>

@@ -1,0 +1,134 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Account Details</h3>
+    </div>
+    <div class="panel-body">
+      <form id="form-account" action="{% url 'accounts:edit' modify_user.username %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="control-label" for="username">Username</label>
+          <input type="text" class="form-control" id="username" name="username" value="{{ modify_user.username }}" disabled>
+        </div>
+        <div class="form-group required">
+          <label class="control-label" for="firstname">First Name</label>
+          <input type="text" class="form-control" id="firstname" name="firstname" value="{{ modify_user.first_name }}">
+        </div>
+        <div class="form-group required">
+          <label class="control-label" for="lastname">Last Name</label>
+          <input type="text" class="form-control" id="lastname" name="lastname" value="{{ modify_user.last_name }}">
+        </div>
+        <div class="form-group">
+          <label class="control-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password">
+        </div>
+        {% if not user.is_superuser or modify_user.username == user.username %}
+          <fieldset disabled>
+        {% endif %}
+          <div class="form-group">
+            <label for="permission">Permission</label>
+            <ul class="list-group" id="permission">
+              <li class="list-group-item list-group-item-info">
+                <label class="text-right" style="width:110px;padding-right:10px">Administrator: </label>
+                <label class="radio-inline" style="width:50px">
+                  <input type="radio" id="adminstrator-no" name="adminstrator" value="no" checked> No
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" id="adminstrator-yes" name="adminstrator" value="yes"
+                  {% if modify_user.is_superuser %}checked{% endif %}> Yes
+                </label>
+              </li>
+              <li class="list-group-item normal-permission">
+                <label class="text-right" style="width:110px;padding-right:10px">Nodes: </label>
+                <label class="radio-inline">
+                  <input type="radio" name="nodes" value="none" checked> None
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="nodes" value="read" {% if 'nodes.view_nodes' in permissions %}checked{% endif %}> Read Only
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="nodes" value="all" {% if 'nodes.modify_nodes' in permissions %}checked{% endif %}> All
+                </label>
+              </li>
+              <li class="list-group-item normal-permission">
+                <label class="text-right" style="width:110px;padding-right:10px">Containers: </label>
+                <label class="radio-inline">
+                  <input type="radio" name="containers" value="none" checked> None
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="containers" value="read" {% if 'containers.view_containers' in permissions %}checked{% endif %}> Read Only
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="containers" value="all" {% if 'containers.modify_containers' in permissions %}checked{% endif %}> All
+                </label>
+              </li>
+              <li class="list-group-item normal-permission">
+                <label class="text-right" style="width:110px;padding-right:10px">Images: </label>
+                <label class="radio-inline">
+                  <input type="radio" name="images" value="none" checked> None
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="images" value="read" {% if 'images.view_images' in permissions %}checked{% endif %}> Read Only
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="images" value="all" {% if 'images.modify_images' in permissions %}checked{% endif %}> All
+                </label>
+              </li>
+              <li class="list-group-item normal-permission">
+                <label class="text-right" style="width:110px;padding-right:10px">Events: </label>
+                <label class="radio-inline">
+                  <input type="radio" name="events" value="none" checked> None
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="events" value="read" {% if 'events.view_events' in permissions %}checked{% endif %}> Read Only
+                </label>
+                <label class="radio-inline">
+                  <input type="radio" name="events" value="all" {% if 'events.modify_events' in permissions %}checked{% endif %}> All
+                </label>
+              </li>
+            </ul>
+          </div>
+        {% if not user.is_superuser or modify_user.username == user.username %}
+          </fieldset>
+        {% endif %}
+        <button type="button" id="btn-add" class="btn btn-primary">Update Account</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "accounts/_common.djhtml" %}
+  <script>
+   $(function () {
+       {% if modify_user.is_superuser %}
+       $(".normal-permission").hide();
+       {% endif %}
+
+       $("#adminstrator-yes").change(function(){
+           $(".normal-permission").hide();
+       })
+
+       $("#adminstrator-no").change(function(){
+           $(".normal-permission").show();
+       })
+
+       $("#btn-add").click(function(){
+           if ($("#firstname").val()
+               && $("#lastname").val()) {
+               $("#form-account").submit();
+           } else {
+               $(".required").each(function(){
+                   if ($(this).find("input").val()) {
+                       $(this).removeClass("has-error");
+                   } else {
+                       $(this).addClass("has-error");
+                   }
+               });
+           }
+       })
+   })
+  </script>
+{% endblock %}

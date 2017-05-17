@@ -42,7 +42,6 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li id="nav-nodes"><a href="{% url 'nodes:index' %}"><span class="glyphicon glyphicon-object-align-vertical" aria-hidden="true"></span>Nodes</a></li>
-            <li id="nav-services"><a href="{% url 'services:index' %}"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>Services </a></li>
             <li id="nav-containers"><a href="{% url 'containers:index' %}"><span class="glyphicon glyphicon-th" aria-hidden="true"></span>Containers </a></li>
             <li id="nav-images"><a href="{% url 'images:index' %}"><span class="glyphicon glyphicon-hdd" aria-hidden="true"></span>Images</a></li>
             <li id="nav-accounts"><a href="{% url 'accounts:index' %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>Accounts</a></li>

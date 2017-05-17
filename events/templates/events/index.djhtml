@@ -51,6 +51,7 @@
             <th>Time</th>
             <th>User</th>
             <th>Type</th>
+            <th>Node</th>
             <th>Operation</th>
           </tr>
         </thead>
@@ -60,6 +61,7 @@
               <td>{{ event.time|date:"Y-m-d H:i:s O" }}</td>
               <td>{{ event.user }}</td>
               <td>{{ event.get_type_display }}</td>
+              <td>{{ event.node.name }}</td>
               <td>{{ event.operation }}</td>
             </tr>
           {% empty %}

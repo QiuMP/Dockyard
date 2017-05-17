@@ -1,0 +1,125 @@
+{% extends "base.djhtml" %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Account Addition</h3>
+    </div>
+    <div class="panel-body">
+      <form id="form-account" action="{% url 'accounts:add' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group required">
+          <label class="control-label" for="username">Username</label>
+          <input type="text" class="form-control" id="username" name="username">
+        </div>
+        <div class="form-group required">
+          <label class="control-label" for="firstname">First Name</label>
+          <input type="text" class="form-control" id="firstname" name="firstname">
+        </div>
+        <div class="form-group required">
+          <label class="control-label" for="lastname">Last Name</label>
+          <input type="text" class="form-control" id="lastname" name="lastname">
+        </div>
+        <div class="form-group required">
+          <label class="control-label" for="password">Password</label>
+          <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="form-group">
+          <label for="permission">Permission</label>
+          <ul class="list-group" id="permission">
+            <li class="list-group-item list-group-item-info">
+              <label class="text-right" style="width:110px;padding-right:10px">Administrator: </label>
+              <label class="radio-inline" style="width:50px">
+                <input type="radio" id="adminstrator-no" name="adminstrator" value="no" checked> No
+              </label>
+              <label class="radio-inline">
+                <input type="radio" id="adminstrator-yes" name="adminstrator" value="yes"> Yes
+              </label>
+            </li>
+            <li class="list-group-item normal-permission">
+              <label class="text-right" style="width:110px;padding-right:10px">Nodes: </label>
+              <label class="radio-inline">
+                <input type="radio" name="nodes" value="none" checked> None
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="nodes" value="read"> Read Only
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="nodes" value="all"> All
+              </label>
+            </li>
+            <li class="list-group-item normal-permission">
+              <label class="text-right" style="width:110px;padding-right:10px">Containers: </label>
+              <label class="radio-inline">
+                <input type="radio" name="containers" value="none" checked> None
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="containers" value="read"> Read Only
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="containers" value="all"> All
+              </label>
+            </li>
+            <li class="list-group-item normal-permission">
+              <label class="text-right" style="width:110px;padding-right:10px">Images: </label>
+              <label class="radio-inline">
+                <input type="radio" name="images" value="none" checked> None
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="images" value="read"> Read Only
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="images" value="all"> All
+              </label>
+            </li>
+            <li class="list-group-item normal-permission">
+              <label class="text-right" style="width:110px;padding-right:10px">Events: </label>
+              <label class="radio-inline">
+                <input type="radio" name="events" value="none" checked> None
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="events" value="read"> Read Only
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="events" value="all"> All
+              </label>
+            </li>
+          </ul>
+        </div>
+        <button type="button" id="btn-add" class="btn btn-primary">Add Account</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {% include "accounts/_common.djhtml" %}
+  <script>
+   $(function () {
+       $("#adminstrator-yes").change(function(){
+           $(".normal-permission").hide();
+       })
+
+       $("#adminstrator-no").change(function(){
+           $(".normal-permission").show();
+       })
+
+       $("#btn-add").click(function(){
+           if ($("#username").val()
+               && $("#firstname").val()
+               && $("#lastname").val()
+               && $("#password").val()) {
+               $("#form-account").submit();
+           } else {
+               $(".required").each(function(){
+                   if ($(this).find("input").val()) {
+                       $(this).removeClass("has-error");
+                   } else {
+                       $(this).addClass("has-error");
+                   }
+               });
+           }
+       })
+   })
+  </script>
+{% endblock %}

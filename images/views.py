@@ -2,45 +2,47 @@ from datetime import datetime
 
 import docker
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from events.models import Event
+from nodes.models import Node
 
 
-def _get_client(url="tcp://192.168.248.101:5000"):
-    try:
-        return docker.from_env(version='auto', environment={"DOCKER_HOST": url})
-    except:
-        messages.add_message('Network error.')
+def _get_client(url):
+    return docker.from_env(version='auto', environment={"DOCKER_HOST": url})
 
 
-def _create_event(user, operation):
-    Event.objects.create(user=user, type='I', operation=operation)
+def _create_event(user, node, operation):
+    Event.objects.create(user=user, type='I', node=node, operation=operation)
 
 
 @login_required
+@permission_required('images.view_images', raise_exception=True)
 def index(request):
-    client = _get_client()
-
     image_list = []
 
-    try:
-        for image in client.images.list(all=True):
-            attrs = image.attrs
-            image_list.append({
-                'tags': image.tags,
-                'short_id': image.short_id,
-                'id': image.id,
-                'created': datetime.fromtimestamp(attrs["Created"]),
-                'virtual_size': round(attrs["VirtualSize"] / 1000000.0, 2),
-            })
-    except:
-        image_list = []
+    for node in Node.objects.all():
+        try:
+            client = _get_client(node.get_address())
+
+            for image in client.images.list(all=True):
+                attrs = image.attrs
+                image_list.append({
+                    'node': node.name,
+                    'tags': image.tags,
+                    'short_id': image.short_id,
+                    'id': image.id,
+                    'created': datetime.fromtimestamp(attrs["Created"]),
+                    'virtual_size': round(attrs["VirtualSize"] / 1000000.0, 2),
+                })
+        except:
+            pass
 
     data = {
+        'node_list': Node.objects.all(),
         'image_list': image_list,
     }
 
@@ -49,33 +51,39 @@ def index(request):
 
 @login_required
 @require_http_methods(["POST"])
+@permission_required('images.modify_images', raise_exception=True)
 def pull(request):
-    client = _get_client()
-
     pull_name = request.POST.get('pull_name')
+    node_name = request.POST.get('node_name')
     if pull_name:
         try:
+            node = Node.objects.get(name=node_name)
+            client = _get_client(node.get_address())
+
             if len(pull_name.split(':')) == 1:
                 pull_name += ':latest'
 
             client.images.pull(pull_name)
             messages.add_message(request, messages.INFO, 'Pull "' + \
                                  pull_name + '" success.')
-            _create_event(request.user, 'Pull image "' + pull_name + '"')
+            _create_event(request.user, node, 'Pull image "' + pull_name + '".')
         except Exception, message:
-            messages.add_message(request, messages.ERROR, message.explanation)
+            messages.add_message(request, messages.ERROR, message)
 
     return redirect(reverse('images:index'))
 
 
 @login_required
 @require_http_methods(["POST"])
+@permission_required('images.modify_images', raise_exception=True)
 def remove(request):
-    client = _get_client()
-
     image_id = request.POST.get('image_id')
-    if image_id:
+    node_name = request.POST.get('node_name')
+    if image_id and node_name:
         try:
+            node = Node.objects.get(name=node_name)
+            client = _get_client(node.get_address())
+
             try:
                 image_name = client.images.get(image_id).tags[0]
             except:
@@ -84,23 +92,27 @@ def remove(request):
             client.images.remove(image_id)
             messages.add_message(request, messages.INFO, 'Remove image "' + \
                                  image_name + '" success.')
-            _create_event(request.user, 'Remove image "' + image_name + \
-                          '"')
+            _create_event(request.user, node, 'Remove image "' + image_name + \
+                          '".')
         except Exception, message:
-            messages.add_message(request, messages.ERROR, message.explanation)
+            messages.add_message(request, messages.ERROR, message)
 
     return redirect(reverse('images:index'))
 
 
 @login_required
 @require_http_methods(["POST"])
+@permission_required('images.modify_images', raise_exception=True)
 def edit(request):
-    client = _get_client()
-
     tag_name = request.POST.get('tag_name').strip()
     image_id = request.POST.get('image_id')
-    if tag_name:
+    node_name = request.POST.get('node_name')
+
+    if node_name and tag_name and image_id:
         try:
+            node = Node.objects.get(name=node_name)
+            client = _get_client(node.get_address())
+
             image = client.images.get(image_id)
             tag_list = []
             for tag in tag_name.split():
@@ -119,11 +131,12 @@ def edit(request):
                 messages.add_message(request, messages.INFO, 'Edit image "' + \
                                      image_id + '" name to "' + \
                                      ' '.join(tag_list) + '" success.')
-                _create_event(request.user, 'Edit image "' + image_id + '" name to "' + \
-                              ' '.join(tag_list) + '"')
+                _create_event(request.user, node,
+                              'Edit image "' + image_id + '" name to "' + \
+                              ' '.join(tag_list) + '".')
             else:
                 messages.add_message(request, messages.ERROR, 'Format Error!')
         except Exception, message:
-            messages.add_message(request, messages.ERROR, message.explanation)
+            messages.add_message(request, messages.ERROR, message)
 
     return redirect(reverse('images:index'))

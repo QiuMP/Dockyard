@@ -1,3 +1,9 @@
 from django.db import models
 
-# Create your models here.
+
+class Container(models.Model):
+    class Meta:
+        permissions = (
+            ("view_containers", "Can see container's list"),
+            ("modify_containers", "Can add and change container"),
+        )

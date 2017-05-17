@@ -1,5 +1,210 @@
 {% extends "base.djhtml" %}
 
+{% block content %}
+  <div class="row show-grid">
+    <div class="col-sm-6">
+      <button type="button" class="btn btn-primary" onclick="location.reload()">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+        <b>Refresh</b>
+      </button>
+      <a href="{% url 'accounts:add' %}" type="button" class="btn btn-success">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        <b>Add Account</b>
+      </a>
+    </div>
+    <div class="clearfix visible-xs-block" style="height:10px"></div>
+    <div class="col-sm-offset-3 col-sm-3">
+      <div class="has-feedback">
+        <input type="text" class="form-control" id="search-accounts" aria-describedby="clean" placeholder="Search accounts...">
+        <span class="glyphicon glyphicon-search form-control-feedback" id="search-accounts-clean" aria-hidden="true"></span>
+        <span id="clean" class="sr-only">search accounts</span>
+      </div>
+    </div>
+  </div>
+  <!-- 容器表格 -->
+  <div class="row">
+    <div class="col-sm-12 table-responsive">
+      <table id="accounts-table" class="table table-bordered table-hover" style="margin-bottom:300px">
+        <colgroup>
+          <col span="1" style="width:31px" />
+          <col span="4"/>
+          <col style="width:138px"/>
+        </colgroup>
+        <thead>
+          <tr class="title">
+            <th data-toggle="tooltip" title="Active" data-placement="top" data-container="body"><span class="glyphicon glyphicon-heart" aria-hidden="true"></span></th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Permission</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in user_list %}
+            <tr>
+              {% if user.is_active %}
+                <td data-toggle="tooltip" title="enabled" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-green">●</span>
+                  <span class="sr-only">enabled</span>
+                </td>
+              {% else %}
+                <td data-toggle="tooltip" title="disabled" data-placement="top" data-container="body" style="padding-left: 9px" >
+                  <span class="round-red">●</span>
+                  <span class="sr-only">disabled</span>
+                </td>
+              {% endif %}
+              <td>{{ user.username }}</td>
+              <td>{{ user.first_name }}</td>
+              <td>{{ user.last_name }}</td>
+              <td>
+                {% for permission in user.permission_list %}
+                  <span class="label label-default" style="font-size:0.9em">{{ permission }}</span>
+                {% empty %}
+                  <span class="label label-default" style="font-size:0.9em">None</span>
+                {% endfor %}
+              </td>
+              <td>
+                <a href="{% url 'accounts:edit' user.username %}" style="margin-right:0.3em" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span></a>
+                {% if user.is_active %}
+                  <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#disableModal" data-whatever="{{ user.username }}"><span class="glyphicon glyphicon-pause" aria-hidden="true"></span></button>
+                {% else %}
+                  <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#enableModal" data-whatever="{{ user.username }}"><span class="glyphicon glyphicon-play" aria-hidden="true"></span></button>
+                {% endif %}
+                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#removeModal" data-whatever="{{ user.username }}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- 禁用弹出框 -->
+  <div class="modal fade" id="disableModal" tabindex="-1" role="dialog" aria-labelledby="disableModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="disableModalLabel">Disable Account</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to disable this account?</p>
+          <form id="form-disable-account" method="post" action="{% url 'accounts:disable' %}">
+            {% csrf_token %}
+            <input type="text" class="username sr-only" name="username">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-disable">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 启用弹出框 -->
+  <div class="modal fade" id="enableModal" tabindex="-1" role="dialog" aria-labelledby="enableModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="enableModalLabel">Enable Account</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to enable this account?</p>
+          <form id="form-enable-account" method="post" action="{% url 'accounts:enable' %}">
+            {% csrf_token %}
+            <input type="text" class="username sr-only" name="username">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-enable">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 删除弹出框 -->
+  <div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="removeModalLabel">Remove Account</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to remove this account?</p>
+          <form id="form-remove-account" method="post" action="{% url 'accounts:remove' %}">
+            {% csrf_token %}
+            <input type="text" class="username sr-only" name="username">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-remove">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
 {% block extra_js %}
   {% include "accounts/_common.djhtml" %}
+  <script>
+   $(function () {
+       // 工具说明
+       $("[data-toggle='tooltip']").tooltip();
+
+       // 实现搜索功能
+       $("#search-accounts").bind("input propertychange", function(){
+           var searchText = $(this).val().toLowerCase();
+           $("#accounts-table tbody").find("tr").each(function(){
+               $(this).show();
+               cells = $(this).find("td");
+               if (cells.eq(0).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(1).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(2).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(4).text().toLowerCase().indexOf(searchText) == -1
+               )
+                   $(this).hide();
+           });
+       });
+
+       // 禁用
+       $("#disableModal").on("show.bs.modal", function(event){
+           var button = $(event.relatedTarget);
+           var username = button.data('whatever');
+           $(this).find('.modal-title').html('Disable Account: <i>' + username + '</i>');
+           $(this).find('.username').val(username);
+       });
+
+       $("#btn-disable").click(function(){
+           $("#form-disable-account").submit();
+       });
+
+       // 启用
+       $("#enableModal").on("show.bs.modal", function(event){
+           var button = $(event.relatedTarget);
+           var username = button.data('whatever');
+           $(this).find('.modal-title').html('Enable Account: <i>' + username + '</i>');
+           $(this).find('.username').val(username);
+       });
+
+       $("#btn-enable").click(function(){
+           $("#form-enable-account").submit();
+       });
+
+       // 删除
+       $("#removeModal").on("show.bs.modal", function(event){
+           var button = $(event.relatedTarget);
+           var username = button.data('whatever');
+           $(this).find('.modal-title').html('Remove Account: <i>' + username + '</i>');
+           $(this).find('.username').val(username);
+       });
+
+       $("#btn-remove").click(function(){
+           $("#form-remove-account").submit();
+       });
+   })
+  </script>
 {% endblock %}
