@@ -12,7 +12,7 @@ from nodes.models import Node
 
 
 def _get_client(url):
-    return docker.from_env(timeout=1, version='auto', environment={"DOCKER_HOST": url})
+    return docker.from_env(timeout=2, version='auto', environment={"DOCKER_HOST": url})
 
 
 def _create_event(user, node, operation):
