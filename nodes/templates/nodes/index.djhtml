@@ -116,6 +116,10 @@
                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#removeModal" data-whatever="{{ node.name }}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
               </td>
             </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8"><div class="alert alert-danger" role="alert" style="margin-bottom:0">Node's list is empty!</div></td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>

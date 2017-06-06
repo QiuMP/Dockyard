@@ -27,7 +27,12 @@ def _get_client(url="tcp://192.168.248.101:5000"):
 def index(request):
     container_list = []
 
-    for node in Node.objects.all():
+    nodes = Node.objects.all()
+    if not nodes:
+        messages.error(request, 'Node\'s list is empty! Please add a node before using containers.')
+        return redirect(reverse('nodes:index'))
+
+    for node in nodes:
         try:
             client = _get_client(node.get_address())
 
@@ -453,7 +458,7 @@ def start(request):
                           'Start container "' + container_name + '".')
 
         except Exception, message:
-            messages.add_message(request, messages.ERROR, message.explanation)
+            messages.add_message(request, messages.ERROR, message)
 
     return redirect(request.META["HTTP_REFERER"])
 

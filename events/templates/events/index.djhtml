@@ -90,7 +90,8 @@
                cells = $(this).find("td");
                if (cells.eq(1).text().toLowerCase().indexOf(searchText) == -1
                    && cells.eq(2).text().toLowerCase().indexOf(searchText) == -1
-                   && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1)
+                   && cells.eq(3).text().toLowerCase().indexOf(searchText) == -1
+                   && cells.eq(4).text().toLowerCase().indexOf(searchText) == -1)
                    $(this).hide();
            });
        });

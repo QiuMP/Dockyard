@@ -24,7 +24,12 @@ def _create_event(user, node, operation):
 def index(request):
     image_list = []
 
-    for node in Node.objects.all():
+    nodes = Node.objects.all()
+    if not nodes:
+        messages.error(request, 'Node\'s list is empty! Please add a node before using images.')
+        return redirect(reverse('nodes:index'))
+
+    for node in nodes:
         try:
             client = _get_client(node.get_address())
 
